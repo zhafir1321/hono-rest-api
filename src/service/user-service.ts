@@ -89,13 +89,14 @@ export class UserService {
     }
 
     static async get(token: string | undefined | null): Promise<User> {
-        if (!token) {
+
+        const result = UserValidation.TOKEN.safeParse(token)
+
+        if (result.error) {
             throw new HTTPException(401, {
                 message: "Unauthorized"
             })
         }
-
-        token = UserValidation.TOKEN.parse(token)
 
 
         
