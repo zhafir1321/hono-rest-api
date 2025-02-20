@@ -2,6 +2,7 @@ import { HTTPException } from "hono/http-exception";
 import { prismaClient } from "../application/database";
 import { BookRequest, BookResponse, toBookResponse, toBooksResponse } from "../model/book-model";
 import { BookValidation } from "../validation/book-validation";
+import { logger } from "../application/logging";
 
 export class BookService {
     static async createBook(request: BookRequest): Promise<BookResponse> {
@@ -26,6 +27,7 @@ export class BookService {
                 id: bookId
             }
         })
+        
 
         if (!book) {
             throw new HTTPException(404, {

@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 import { BookRequest } from "../model/book-model";
 import { BookService } from "../service/book-service";
+import { logger } from "../application/logging";
+import { ApplicationVariables } from "../model/app-model";
 
-export const bookController = new Hono()
+export const bookController = new Hono<{Variables: ApplicationVariables}>()
 
 bookController.post('/books', async (c) => {
     const request = await c.req.json() as BookRequest
@@ -16,7 +18,6 @@ bookController.post('/books', async (c) => {
 
 bookController.get('/books', async (c) => {
     const response = await BookService.getBooks()
-
     return c.json({
         response
     })

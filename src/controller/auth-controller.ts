@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { LoginUserRequest, RegisterUserRequest } from "../model/user-model";
 import { UserService } from "../service/user-service";
 
-export const userController = new Hono()
+export const authController = new Hono()
 
-userController.post('/register', async (c) => {
+authController.post('/register', async (c) => {
     const request = await c.req.json() as RegisterUserRequest
 
     const response = await UserService.registerUser(request)
@@ -14,7 +14,7 @@ userController.post('/register', async (c) => {
     })
 })
 
-userController.post('/login', async (c) => {
+authController.post('/login', async (c) => {
     const request = await c.req.json() as LoginUserRequest
     const response = await UserService.loginUser(request)
 
