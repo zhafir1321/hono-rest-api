@@ -13,6 +13,15 @@ export type AuthorResponse = {
     gender: string
 }
 
+export type AuthorsResponse = {
+    page: number
+    totalPages: number
+    totalRows: number
+    limit: number
+    message: string
+    data: AuthorResponse[]
+}
+
 export function toAuthorResponse(author: Author): AuthorResponse {
     return {
         id: author.id,

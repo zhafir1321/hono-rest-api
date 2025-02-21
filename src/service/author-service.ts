@@ -1,8 +1,10 @@
 import { HTTPException } from "hono/http-exception";
 import { prismaClient } from "../application/database";
-import { AuthorRequest, AuthorResponse, toAuthorResponse, toAuthorsResponse } from "../model/author-model";
+import { AuthorRequest, AuthorResponse, AuthorsResponse, toAuthorResponse, toAuthorsResponse } from "../model/author-model";
 import { AuthorValidation } from "../validation/author-validation";
 import { Gender } from "@prisma/client";
+import { AuthorQuery, Pagination } from "../model/app-model";
+import { PaginationValidation } from "../validation/pagination-validation";
 
 export class AuthorService {
     static async createAuthor(request: AuthorRequest): Promise<string> { 
@@ -44,14 +46,52 @@ export class AuthorService {
         return code;
     }
 
-    static async getAuthors(): Promise<AuthorResponse[]> {
-        const authors = await prismaClient.author.findMany({
-            include: {
-                Book: true
+    static async getAuthors(pagination: Pagination, filter: AuthorQuery): Promise<AuthorsResponse> {
+        pagination = PaginationValidation.PAGINATION.parse(pagination)
+        const page = pagination.page
+        const limit = pagination.limit
+
+        const totalRows = await prismaClient.author.count({
+            where: {
+                name: {
+                    contains: filter.name
+                },
+                code: {
+                    contains: filter.code
+                }
             }
         })
 
-        return toAuthorsResponse(authors)
+        const totalPages = Math.ceil(totalRows / limit)
+
+        const offset = (page - 1) * limit
+        
+        const authors = await prismaClient.author.findMany({
+            where: {
+                name: {
+                    contains: filter.name
+                },
+                code: {
+                    contains: filter.code
+                }
+            },
+            include: {
+                Book: true
+            },
+            skip: offset,
+            take: limit
+        })
+
+        const authorsResponse = toAuthorsResponse(authors)
+
+        return {
+            page: page,
+            totalPages: totalPages,
+            totalRows: totalRows,
+            limit: limit,
+            message: "Authors retrieved successfully",
+            data: authorsResponse
+        } as AuthorsResponse
     }
 
     static async getAuthorById(id: string): Promise<AuthorResponse> { 

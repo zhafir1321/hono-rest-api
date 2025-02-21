@@ -4,6 +4,8 @@ import { LoginUserRequest, Payload, RegisterUserRequest, toUserResponse, toUsers
 import { UserValidation } from "../validation/user-validation";
 import { HTTPException } from 'hono/http-exception'
 import {sign, decode} from 'hono/jwt'
+import { logger } from "../application/logging";
+import { JWTPayload } from "hono/utils/jwt/types";
 
 const secret = Bun.env.JWT_SECRET!
 export class UserService {
@@ -77,9 +79,13 @@ export class UserService {
             exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) 
         } as Payload
 
-        
+        logger.warn("Creating token...")
 
-        const token = await sign(payload, secret, "HS256")
+            const token = await sign(payload, secret, "HS256")
+            logger.info(token)
+        
+        logger.warn("Token created")
+
         
     
         
