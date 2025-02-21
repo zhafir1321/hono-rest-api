@@ -5,11 +5,13 @@ import { bookController } from './controller/book-controller'
 import { authenticationMiddleware } from './middleware/authentication'
 import { errorHandler } from './error/error'
 import { ApplicationVariables } from './model/app-model'
+import { userController } from './controller/user-controller'
 
 const app = new Hono<{Variables: ApplicationVariables}>()
 
 app.route("/api", authController)
 app.use(authenticationMiddleware)
+app.route('/api', userController)
 app.route("/api", authorController)
 app.route("/api", bookController)
 

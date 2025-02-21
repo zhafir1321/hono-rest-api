@@ -81,15 +81,10 @@ export class UserService {
 
         logger.warn("Creating token...")
 
-            const token = await sign(payload, secret, "HS256")
-            logger.info(token)
+        const token = await sign(payload, secret, "HS256")
+        logger.info(token)
         
         logger.warn("Token created")
-
-        
-    
-        
-        
 
         return token
     }
@@ -129,23 +124,66 @@ export class UserService {
         return user
     }
 
-    static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+    static async update(loggedInUser: User, request: UpdateUserRequest, id: number): Promise<UserResponse> {
         request = UserValidation.UPDATE.parse(request)
 
+        let user = await prismaClient.user.findUnique({
+            where: {
+                id: id
+            }
+        })
+
+        if (loggedInUser.id !== id) {
+            throw new HTTPException(403, {
+                message: "Forbidden"
+            })
+        }
+
+        if (!user) {
+            throw new HTTPException(404, {
+                message: "User not found"
+            })
+        }
+
         if (request.username) {
-            user.username = request.username
+            const existUsername = await prismaClient.user.count({
+                where: {
+                    username: request.username
+                }
+            })
+
+            if (existUsername != 0) {
+                throw new HTTPException(400, {
+                    message: "Username already exists"
+                })
+            }
         }
 
         if (request.email) {
-            user.email = request.email
+            const existEmail = await prismaClient.user.count({
+                where: {
+                    email: request.email
+                }
+            })
+
+            if (existEmail != 0) {
+                throw new HTTPException(400, {
+                    message: "Email already exists"
+                })
+            }
         }
 
         if (request.password) {
-            user.password = await Bun.password.hash(request.password, {
+            request.password = await Bun.password.hash(request.password, {
                 algorithm: "bcrypt",
                 cost: 10
             })
         }
+
+        user = {
+            ...user,
+            ...request
+        }  
 
         user = await prismaClient.user.update({
             where: {
