@@ -12,6 +12,12 @@ export type UserResponse = {
     email: string;
 }
 
+export type UpdateUserRequest = {
+    username?: string
+    email?: string
+    password?: string
+}
+
 export type Payload = {
     id: number;
     username: string;
