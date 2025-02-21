@@ -5,6 +5,7 @@ import { AuthorValidation } from "../validation/author-validation";
 import { Gender } from "@prisma/client";
 import { AuthorQuery, Pagination } from "../model/app-model";
 import { PaginationValidation } from "../validation/pagination-validation";
+import { FilterValidation } from "../validation/filter-validation";
 
 export class AuthorService {
     static async createAuthor(request: AuthorRequest): Promise<string> { 
@@ -48,6 +49,7 @@ export class AuthorService {
 
     static async getAuthors(pagination: Pagination, filter: AuthorQuery): Promise<AuthorsResponse> {
         pagination = PaginationValidation.PAGINATION.parse(pagination)
+        filter = FilterValidation.AUTHOR_QUERY.parse(filter)
         const page = pagination.page
         const limit = pagination.limit
 
