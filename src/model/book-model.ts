@@ -14,6 +14,15 @@ export type BookResponse = {
     authorId: string
 }
 
+export type BooksResponse = {
+    page: number
+    totalPages: number
+    totalRows: number
+    limit: number
+    message: string
+    data: BookResponse[]
+}
+
 export function toBookResponse(book: Book): BookResponse {
     return {
         id: book.id,

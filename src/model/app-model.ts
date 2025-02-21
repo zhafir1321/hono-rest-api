@@ -12,7 +12,7 @@ export type AuthorQuery = {
 
 export type BookQuery = {
     title: string
-    authorId: string
+    authorId: number
 }
 
 export type Pagination = {
